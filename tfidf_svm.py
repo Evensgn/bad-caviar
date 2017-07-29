@@ -29,7 +29,6 @@ for text in data_texts:
 	text_pro = " ".join(words)
 	data_texts_pro.append(text_pro)
 
-
 filenames = []
 for i in range(6000):
 	filenames.append('comment_' + str(i))
@@ -46,6 +45,7 @@ for text in alldata_texts:
 			words.append(word)
 	text_pro = " ".join(words)
 	alldata_texts_pro.append(text_pro)
+
 
 import numpy as np
 from numpy import random
@@ -69,12 +69,13 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import PCA
 
 vectorizer = TfidfVectorizer()
+vectorizer.fit(test_texts)
 train_texts = np.array(train_texts)
-train_vecs = vectorizer.fit_transform(train_texts)
+train_vecs = vectorizer.transform(train_texts)
 train_vecs_arr = train_vecs.toarray()
-pca = PCA(n_components = 500)
-# train_x = pca.fit_transform(train_vecs_arr)
-train_x = train_vecs_arr
+pca = PCA(n_components = 600)
+train_x = pca.fit_transform(train_vecs_arr)
+# train_x = train_vecs_arr
 
 from sklearn import svm, metrics
 
@@ -86,8 +87,8 @@ clf.fit(train_x, train_labels)
 
 test_vecs = vectorizer.transform(test_texts)
 test_vecs_arr = test_vecs.toarray()
-# test_x = pca.transform(test_vecs_arr)
-test_x = test_vecs_arr
+test_x = pca.transform(test_vecs_arr)
+# test_x = test_vecs_arr
 
 # prediction = clf.predict(test_x)
 prediction = clf.predict_proba(test_x)
