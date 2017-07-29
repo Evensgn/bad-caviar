@@ -13,7 +13,7 @@ with open('data/training_new.csv') as f:
 		data_texts.append(str(read_file('data/comment_new/' + row['id'] + '.txt')))
 		data_labels.append(int(row['pred']))
 	
-with open('stopwords.txt') as f:
+with open('stopwords.txt', encoding = 'utf-8') as f:
 	buff = f.read()
 	stopwords = buff.split('\n')
 
