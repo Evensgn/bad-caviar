@@ -46,20 +46,23 @@ for text in alldata_texts:
 	text_pro = " ".join(words)
 	alldata_texts_pro.append(text_pro)
 
-
 import numpy as np
 from numpy import random
 
 data_arr = list(zip(data_texts_pro, data_labels))
-data_arr = random.permutation(data_arr)
+data_arr = np.array(data_arr)
+# data_arr = random.permutation(data_arr)
 
 train_texts = data_arr[:, 0]
 train_labels = data_arr[:, 1].astype(int)
 
+# train_texts = data_arr[:850, 0]
+# train_labels = data_arr[:850, 1].astype(int)
+
 test_texts = np.array(alldata_texts_pro)
 
-# test_texts = data_arr[:, 0]
-# test_labels = data_arr[:, 1].astype(int)
+# test_texts = data_arr[850:, 0]
+# test_labels = data_arr[850:, 1].astype(int)
 
 # print(test_texts)
 # print(test_labels)
@@ -74,27 +77,36 @@ train_texts = np.array(train_texts)
 train_vecs = vectorizer.transform(train_texts)
 train_vecs_arr = train_vecs.toarray()
 pca = PCA(n_components = 600)
-train_x = pca.fit_transform(train_vecs_arr)
-# train_x = train_vecs_arr
+# train_x = pca.fit_transform(train_vecs_arr)
+train_x = train_vecs_arr
+
+test_vecs = vectorizer.transform(test_texts)
+test_vecs_arr = test_vecs.toarray()
+# test_x = pca.transform(test_vecs_arr)
+test_x = test_vecs_arr
 
 from sklearn import svm, metrics
+from sklearn import preprocessing
+
+train_x = preprocessing.normalize(train_x, norm = 'l2')
+test_x = preprocessing.normalize(test_x, norm = 'l2')
 
 # clf = svm.SVR(gamma = 1)
-clf = svm.SVC(gamma = 1, probability = True)
+# clf = svm.SVC(kernel = 'sigmoid', gamma = 0.6, probability = True)
+clf = svm.SVC(kernel = 'rbf', gamma = 0.9, probability = True)
 # clf = svm.SVC(kernel = 'linear', probability = True)
 
 clf.fit(train_x, train_labels)
 
-test_vecs = vectorizer.transform(test_texts)
-test_vecs_arr = test_vecs.toarray()
-test_x = pca.transform(test_vecs_arr)
-# test_x = test_vecs_arr
-
 # prediction = clf.predict(test_x)
 prediction = clf.predict_proba(test_x)
+
+prediction[5000:, 1] = train_labels
+
 # print(prediction[:, 1])
 
 # test_auc = metrics.roc_auc_score(test_labels, prediction)
+
 # test_auc = metrics.roc_auc_score(test_labels, prediction[:, 1])
 # print(test_auc)
 
@@ -103,10 +115,10 @@ print("Classification report for classifier %s:\n%s\n"
 	  % (clf, metrics.classification_report(test_labels, prediction)))
 print("Confusion matrix:\n%s" % metrics.confusion_matrix(test_labels, prediction))
 '''
-
 headers = ['id', 'pred']
 rows = list(zip(filenames, prediction[:, 1]))
 with open('ans.csv', 'w') as f:
 	f_csv = csv.writer(f)
 	f_csv.writerow(headers)
 	f_csv.writerows(rows)
+
