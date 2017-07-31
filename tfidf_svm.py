@@ -93,7 +93,7 @@ test_x = preprocessing.normalize(test_x, norm = 'l2')
 
 # clf = svm.SVR(gamma = 1)
 # clf = svm.SVC(kernel = 'sigmoid', gamma = 0.6, probability = True)
-clf = svm.SVC(kernel = 'rbf', gamma = 0.9, probability = True)
+clf = svm.SVC(kernel = 'rbf', gamma = 1.1, probability = True)
 # clf = svm.SVC(kernel = 'linear', probability = True)
 
 clf.fit(train_x, train_labels)
