@@ -76,24 +76,24 @@ vectorizer.fit(test_texts)
 train_texts = np.array(train_texts)
 train_vecs = vectorizer.transform(train_texts)
 train_vecs_arr = train_vecs.toarray()
-pca = PCA(n_components = 600)
-# train_x = pca.fit_transform(train_vecs_arr)
-train_x = train_vecs_arr
-
 test_vecs = vectorizer.transform(test_texts)
 test_vecs_arr = test_vecs.toarray()
-# test_x = pca.transform(test_vecs_arr)
-test_x = test_vecs_arr
+
+pca = PCA(n_components = 1000, svd_solver = 'full')
+train_x = pca.fit_transform(train_vecs_arr)
+# train_x = train_vecs_arr
+test_x = pca.transform(test_vecs_arr)
+# test_x = test_vecs_arr
 
 from sklearn import svm, metrics
 from sklearn import preprocessing
 
-train_x = preprocessing.normalize(train_x, norm = 'l2')
-test_x = preprocessing.normalize(test_x, norm = 'l2')
+# train_x = preprocessing.normalize(train_x, norm = 'l2')
+# test_x = preprocessing.normalize(test_x, norm = 'l2')
 
 # clf = svm.SVR(gamma = 1)
 # clf = svm.SVC(kernel = 'sigmoid', gamma = 0.6, probability = True)
-clf = svm.SVC(kernel = 'rbf', gamma = 1.1, probability = True)
+clf = svm.SVC(kernel = 'rbf', gamma = 1.45, C = 1.2, probability = True)
 # clf = svm.SVC(kernel = 'linear', probability = True)
 
 clf.fit(train_x, train_labels)
@@ -117,8 +117,7 @@ print("Confusion matrix:\n%s" % metrics.confusion_matrix(test_labels, prediction
 '''
 headers = ['id', 'pred']
 rows = list(zip(filenames, prediction[:, 1]))
-with open('ans.csv', 'w') as f:
+with open('ans.csv', 'w', encoding = 'utf-8') as f:
 	f_csv = csv.writer(f)
 	f_csv.writerow(headers)
 	f_csv.writerows(rows)
-
